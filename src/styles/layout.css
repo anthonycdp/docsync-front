@@ -1,0 +1,173 @@
+/* CKDEV-NOTE: Layout configuration based on review page structure for global consistency */
+
+/* Main Container Classes */
+.app-container {
+  @apply flex-1 flex flex-col max-w-app-container 2xl:max-w-app-container-xl mx-auto px-4 sm:px-6 lg:px-8 pb-8;
+}
+
+.app-content-wrapper {
+  @apply space-y-4 h-full flex flex-col;
+}
+
+/* Layout Grid Classes */
+.app-main-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 h-full flex-1 min-h-0 w-full;
+}
+
+.app-content-area {
+  @apply col-span-1 h-full w-full overflow-hidden;
+}
+
+.app-sidebar {
+  @apply col-span-1 space-y-3 h-full flex flex-col lg:sticky lg:top-4 w-full;
+}
+
+/* Card and Content Classes */
+.app-card {
+  @apply rounded-lg text-gray-900 border-0 shadow-lg bg-white/80 backdrop-blur-sm h-full flex flex-col;
+}
+
+.app-card-header {
+  @apply flex flex-col space-y-1.5 p-6 pb-3 flex-shrink-0;
+}
+
+.app-card-content {
+  @apply p-6 pt-0 flex-1 flex flex-col;
+}
+
+/* Preview and Document Classes */
+.app-preview-container {
+  @apply bg-gray-50 rounded-lg h-full border border-gray-200 overflow-hidden flex flex-col;
+}
+
+.app-document-container {
+  @apply max-w-app-content mx-auto bg-white p-4 md:p-6 lg:p-8 rounded-lg shadow-sm print:shadow-none print:p-0;
+}
+
+.app-preview-controls {
+  @apply flex items-center justify-between mb-3 flex-shrink-0;
+}
+
+/* Navigation and Pagination */
+.app-pagination-container {
+  @apply flex items-center min-w-[300px];
+}
+
+.app-zoom-controls {
+  @apply flex items-center space-x-3;
+}
+
+/* Form and Input Layout */
+.app-form-grid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.app-form-field {
+  @apply space-y-1.5;
+}
+
+.app-form-input {
+  @apply flex w-full rounded-md border px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 transition-all h-9;
+}
+
+.app-form-input-valid {
+  @apply border-green-300 bg-green-50/50 focus:ring-green-500 focus:border-green-500;
+}
+
+/* Button Classes */
+.app-button-primary {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 hover:bg-blue-700 text-white h-10 py-2;
+}
+
+.app-button-gradient {
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8;
+}
+
+.app-button-secondary {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-100 h-10 px-4 py-2 text-gray-600 hover:text-gray-900;
+}
+
+/* Header Classes */
+.app-header-gradient {
+  @apply rounded-lg bg-white text-gray-900 border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50;
+}
+
+.app-section-header {
+  @apply rounded-lg text-gray-900 border-0 shadow-lg bg-white/80 backdrop-blur-sm;
+}
+
+/* Icon Classes */
+.app-icon-sm {
+  @apply w-4 h-4;
+}
+
+.app-icon-md {
+  @apply w-5 h-5;
+}
+
+/* Status and Validation Classes */
+.app-validation-success {
+  @apply text-xs flex items-center space-x-1 text-green-600;
+}
+
+.app-validation-icon {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+}
+
+/* Responsive Classes */
+@media (max-width: 1024px) {
+  .app-main-grid {
+    @apply grid-cols-1 gap-3 w-full;
+  }
+  
+  .app-content-area {
+    @apply col-span-1 w-full;
+  }
+  
+  .app-sidebar {
+    @apply col-span-1 relative top-auto w-full;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-document-container {
+    @apply p-4;
+  }
+  
+  .app-pagination-container {
+    @apply min-w-[250px];
+  }
+}
+
+/* CKDEV-NOTE: Enhanced responsive breakpoints for better space utilization */
+@media (min-width: 1025px) {
+  .app-main-grid {
+    @apply gap-6 w-full;
+  }
+}
+
+@media (min-width: 1281px) {
+  .app-main-grid {
+    @apply gap-8 w-full;
+  }
+}
+
+/* CKDEV-NOTE: Large screen optimization for container width - breakpoint at 1536px */
+@media (min-width: 1536px) {
+  .app-container {
+    @apply max-w-app-container-xl;
+  }
+  
+  .app-main-grid {
+    @apply gap-10 w-full;
+  }
+}
+
+/* CKDEV-NOTE: Bottom margin utility classes for consistent spacing across all screens */
+.app-bottom-margin {
+  @apply pb-8 md:pb-10 lg:pb-12;
+}
+
+.app-bottom-margin-lg {
+  @apply pb-10 md:pb-12 lg:pb-16;
+}

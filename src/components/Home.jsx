@@ -12,6 +12,9 @@ import PreviewStep from "./PreviewStep"
 import BackToHomeButton from "./BackToHomeButton"
 import Footer from "./Footer"
 
+// CKDEV-NOTE: Centralized API base URL configuration
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://doc-sync-service.onrender.com'
+
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -96,7 +99,7 @@ export default function Home() {
         formData.append('files', file)
       })
 
-      const response = await fetch('https://doc-sync-service.onrender.com/api/documents/process', {
+      const response = await fetch(`${API_BASE_URL}/api/documents/process`, {
         method: 'POST',
         body: formData,
       })
@@ -189,7 +192,7 @@ export default function Home() {
           template_type: processedData?.template_type || 'responsabilidade_veiculo'
         }
         
-        const response = await fetch(`https://doc-sync-service.onrender.com/api/documents/generate/${sessionId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/documents/generate/${sessionId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -14,12 +14,12 @@ export default defineConfig({
   },
   
   server: {
-    port: 3000,
-    host: '127.0.0.1',
+    port: 443,
+    host: 'https://doc-sync-service.onrender.com/',
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'https://doc-sync-service.onrender.com/',
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
@@ -52,6 +52,6 @@ export default defineConfig({
   },
   
   define: {
-    __API_URL__: JSON.stringify('http://127.0.0.1:5000')
+    __API_URL__: JSON.stringify('https://doc-sync-service.onrender.com/')
   }
 })

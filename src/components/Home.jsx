@@ -96,7 +96,7 @@ export default function Home() {
         formData.append('files', file)
       })
 
-      const response = await fetch('http://127.0.0.1:5000/api/documents/process', {
+      const response = await fetch('https://doc-sync-service.onrender.com/api/documents/process', {
         method: 'POST',
         body: formData,
       })
@@ -189,7 +189,7 @@ export default function Home() {
           template_type: processedData?.template_type || 'responsabilidade_veiculo'
         }
         
-        const response = await fetch(`http://127.0.0.1:5000/api/documents/generate/${sessionId}`, {
+        const response = await fetch(`https://doc-sync-service.onrender.com/api/documents/generate/${sessionId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

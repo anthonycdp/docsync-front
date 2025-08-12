@@ -14,7 +14,7 @@ export const queryClient = new QueryClient({
 })
 
 export async function apiRequest(method, url, data = null) {
-  const baseURL = 'http://127.0.0.1:5000'
+  const baseURL = 'https://doc-sync-service.onrender.com/'
   const options = {
     method,
     headers: {

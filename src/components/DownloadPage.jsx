@@ -54,17 +54,16 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
         throw new Error(`URL não disponível para ${fileType}`)
       }
 
-
       const response = await fetch(downloadUrl)
       
       if (!response.ok) {
         
-        // CKDEV-NOTE: Backend now validates PDFs before sending 404, so if we get 404 for PDF it's truly unavailable
+        // CKDEV-NOTE: Enhanced error handling for different file types
         if (response.status === 404) {
           if (fileType === 'pdf') {
             setPdfAvailable(false)
             setPdfCheckAttempted(true)
-            throw new Error(`Arquivo PDF não foi encontrado no servidor. Use o botão "Baixar DOCX" como alternativa.`)
+            throw new Error(`Arquivo PDF não foi encontrado no servidor. O sistema pode estar gerando o arquivo ou houve um problema na conversão. Use o arquivo DOCX como alternativa.`)
           } else {
             throw new Error(`Arquivo ${fileType.toUpperCase()} não encontrado no servidor`)
           }
@@ -75,7 +74,12 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
       
       const blob = await response.blob()
       
-      // CKDEV-NOTE: Backend already validates PDFs thoroughly, trust the response if HTTP was successful
+      // CKDEV-NOTE: Validate blob size for PDFs
+      if (fileType === 'pdf' && blob.size < 100) {
+        setPdfAvailable(false)
+        setPdfCheckAttempted(true)
+        throw new Error(`Arquivo PDF corrompido ou muito pequeno (${blob.size} bytes). Use o arquivo DOCX como alternativa.`)
+      }
       
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -89,8 +93,15 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
       
       setDownloadedFiles(prev => [...prev, fileType])
     } catch (error) {
-      alert(`Erro ao baixar arquivo ${fileType.toUpperCase()}: ${error.message}`)
-    } finally {
+      console.error(`Download error for ${fileType}:`, error)
+      
+      // CKDEV-NOTE: Show user-friendly error messages
+      if (fileType === 'pdf') {
+        alert(`Erro ao baixar PDF: ${error.message}\n\nRecomendação: Use o arquivo DOCX que está disponível.`)
+      } else {
+        alert(`Erro ao baixar arquivo ${fileType.toUpperCase()}: ${error.message}`)
+      }
+    
       downloadInProgressRef.current.delete(downloadKey)
       setDownloadingFile(null)
     }

@@ -108,36 +108,20 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
   }, []) // CKDEV-NOTE: No dependencies needed since we use refs for state that shouldn't cause re-renders
 
   const getPdfUrl = () => {
-    // CKDEV-NOTE: Use the PDF URL provided directly from backend if available
-    if (processedData?.pdf_download_url) {
-      return processedData.pdf_download_url
-    }
-    
-    // CKDEV-NOTE: Fallback to generating PDF URL from DOCX URL
+    // CKDEV-NOTE: Only expose PDF when backend declared it available
+    const hasPdf = Array.isArray(processedData?.formats_available) && processedData.formats_available.includes('pdf')
+    if (!hasPdf) return null
+
+    if (processedData?.pdf_download_url) return processedData.pdf_download_url
+
+    // CKDEV-NOTE: Last-resort fallback to infer URL from DOCX when backend forgot the explicit URL
     const docxUrl = processedData?.download_url
-    if (!docxUrl) {
-      return null
-    }
-    
+    if (!docxUrl) return null
+
     try {
-      let pdfUrl
-      
-      if (docxUrl.includes('.docx')) {
-        pdfUrl = docxUrl.replace('.docx', '.pdf')
-      } else if (docxUrl.match(/\.(docx|doc)$/i)) {
-        pdfUrl = docxUrl.replace(/\.(docx|doc)$/i, '.pdf')
-      } else {
-        // If no extension found, try common patterns
-        if (docxUrl.includes('processed_')) {
-          pdfUrl = docxUrl + '.pdf'
-        } else {
-          pdfUrl = docxUrl.replace(/([^\/]+)$/, '$1.pdf')
-        }
-      }
-      
-      return pdfUrl
-      
-    } catch (error) {
+      if (docxUrl.match(/\.(docx|doc)$/i)) return docxUrl.replace(/\.(docx|doc)$/i, '.pdf')
+      return null
+    } catch (_e) {
       return null
     }
   }
@@ -167,17 +151,7 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
       try {
         const response = await fetch(pdfUrl, { method: 'HEAD' })
         if (!response.ok) {
-          // Try main fallback only if we don't have direct PDF URL from backend
-          if (!processedData?.pdf_download_url && processedData?.download_url) {
-            const fallbackUrl = processedData.download_url.replace(/\.(docx|doc)$/i, '.pdf')
-            const fallbackResponse = await fetch(fallbackUrl, { method: 'HEAD' })
-            
-            if (!fallbackResponse.ok) {
-              setPdfAvailable(false)
-            }
-          } else {
-            setPdfAvailable(false)
-          }
+          setPdfAvailable(false)
         }
       } catch (error) {
         setPdfAvailable(false)
@@ -188,7 +162,7 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
     }
 
     checkPdfAvailability()
-  }, [pdfUrl, processedData?.download_url, processedData?.pdf_download_url])
+  }, [pdfUrl])
 
   if (!processedData?.download_url) {
     return (

@@ -70,11 +70,11 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [dragStates, setDragStates] = useState({})
 
-  // CKDEV-NOTE: Ref para o elemento de foco principal (step atual do wizard)
-  const stepRef = useRef(null)
+  // CKDEV-NOTE: Ref para o elemento de foco principal (área de drag-and-drop)
+  const uploadAreaRef = useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza o step atual do wizard
-  usePageScroll(stepRef, 'upload')
+  // CKDEV-NOTE: Scroll inteligente que centraliza a área de drag-and-drop
+  usePageScroll(uploadAreaRef, 'upload')
 
   const WIZARD_STEPS = WIZARD_STEP_CONFIGS[template.id] || WIZARD_STEP_CONFIGS.cessao_credito
   const currentStepData = WIZARD_STEPS[currentStep]
@@ -241,7 +241,6 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
                 {/* Current Step Info */}
                 <div className="text-center mb-4 flex-shrink-0">
                   <h2 
-                    ref={stepRef}
                     className="text-xl font-bold text-gray-900 mb-1"
                   >
                     {currentStepData.title}
@@ -316,7 +315,7 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
                         </div>
                       </motion.div>
                     ) : (
-                      <div className="flex flex-col justify-center h-full relative z-10">
+                      <div ref={uploadAreaRef} className="flex flex-col justify-center h-full relative z-10">
                         <div className="w-12 h-12 mx-auto mb-4 p-3 rounded-xl transition-all duration-300 bg-gray-100 group-hover:bg-blue-50 shadow-sm">
                           <Upload className={cn(
                             "w-full h-full transition-colors duration-300 text-gray-500 group-hover:text-blue-600",

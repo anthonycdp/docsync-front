@@ -11,11 +11,11 @@ import { usePageScroll } from '../hooks/use-scroll-to-focus'
 const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActions = true, templateName, onBackToHome }) => {
   const [isCanceling, setIsCanceling] = React.useState(false)
   
-  // CKDEV-NOTE: Ref para o elemento de foco principal (barra de progresso)
-  const progressRef = React.useRef(null)
+  // CKDEV-NOTE: Ref para o elemento de foco principal (status de extração de dados)
+  const extractionStatusRef = React.useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza a barra de progresso
-  usePageScroll(progressRef, 'processing')
+  // CKDEV-NOTE: Scroll inteligente que centraliza o status de extração de dados
+  usePageScroll(extractionStatusRef, 'processing')
   
   const getProcessingStep = () => {
     if (progress < 30) return { icon: FileSearch, text: 'Analisando documentos...', color: 'text-blue-600', bgColor: 'from-blue-500 to-blue-600' }
@@ -54,7 +54,7 @@ const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActi
             </div>
           
           {/* Progress Bar */}
-          <div ref={progressRef} className="space-y-2">
+          <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-600">
               <span className="font-medium">Progresso do Processamento</span>
               <span className="font-semibold text-blue-600">{Math.round(progress)}%</span>
@@ -109,6 +109,7 @@ const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActi
               return (
                 <motion.div
                   key={item.step}
+                  ref={item.step === 'Extração de Dados' ? extractionStatusRef : null}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}

@@ -13,11 +13,11 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
   // CKDEV-NOTE: Ref to prevent duplicate downloads when user clicks multiple times quickly
   const downloadInProgressRef = useRef(new Set())
   
-  // CKDEV-NOTE: Ref para o elemento de foco principal (título de sucesso)
-  const successTitleRef = useRef(null)
+  // CKDEV-NOTE: Ref para o elemento de foco principal (cards de download)
+  const downloadCardsRef = useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza o título de sucesso na tela
-  usePageScroll(successTitleRef, 'download')
+  // CKDEV-NOTE: Scroll inteligente que centraliza os cards de download na tela
+  usePageScroll(downloadCardsRef, 'download')
 
   const getTemplateDisplayName = (templateId, fallbackName) => {
     const templateNames = {
@@ -268,7 +268,6 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
             
             <div className="space-y-2">
               <h1 
-                ref={successTitleRef}
                 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent"
               >
                 Processamento Concluído!
@@ -344,7 +343,7 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className={`grid gap-6 ${pdfUrl ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-lg mx-auto'}`}>
+              <div ref={downloadCardsRef} className={`grid gap-6 ${pdfUrl ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-lg mx-auto'}`}>
                 {/* DOCX Download - Always show if available */}
                 {processedData.download_url && (
                   <motion.div

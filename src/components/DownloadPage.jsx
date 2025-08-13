@@ -92,6 +92,10 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
       document.body.removeChild(a)
       
       setDownloadedFiles(prev => [...prev, fileType])
+      
+      // CKDEV-NOTE: Clean up download state after successful download
+      downloadInProgressRef.current.delete(downloadKey)
+      setDownloadingFile(null)
     } catch (error) {
       console.error(`Download error for ${fileType}:`, error)
       

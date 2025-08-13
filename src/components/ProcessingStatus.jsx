@@ -8,14 +8,15 @@ import { Loader2, CheckCircle, AlertCircle, Clock, FileSearch, Brain, Zap, X, Ar
 import BackToHomeButton from './BackToHomeButton'
 import { usePageScroll } from '../hooks/use-scroll-to-focus'
 
+
 const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActions = true, templateName, onBackToHome }) => {
   const [isCanceling, setIsCanceling] = React.useState(false)
   
-  // CKDEV-NOTE: Ref para o elemento de foco principal (status de extração de dados)
-  const extractionStatusRef = React.useRef(null)
+  // CKDEV-NOTE: Ref para o elemento de foco principal (status de validação)
+  const validationStatusRef = React.useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza o status de extração de dados
-  usePageScroll(extractionStatusRef, 'processing')
+  // CKDEV-NOTE: Hook para centralizar o foco no status de validação quando completo
+  usePageScroll(validationStatusRef, progress >= 90)
   
   const getProcessingStep = () => {
     if (progress < 30) return { icon: FileSearch, text: 'Analisando documentos...', color: 'text-blue-600', bgColor: 'from-blue-500 to-blue-600' }
@@ -109,7 +110,8 @@ const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActi
               return (
                 <motion.div
                   key={item.step}
-                  ref={item.step === 'Extração de Dados' ? extractionStatusRef : null}
+                  ref={item.step === 'Validação' ? validationStatusRef : null}
+                  tabIndex={item.step === 'Validação' ? 0 : -1}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
@@ -117,7 +119,7 @@ const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActi
                     isCompleted ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm' : 
                     isActive ? 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200/60 shadow-md' : 
                     'bg-gray-50/60 border border-gray-200/40 hover:bg-gray-100/60'
-                  }`}
+                  } ${item.step === 'Validação' ? 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2' : ''}`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover/step:scale-110 ${
                     isCompleted ? `bg-gradient-to-br ${item.color} shadow-lg` : 
@@ -137,7 +139,9 @@ const ProcessingStatus = ({ progress, isProcessing, onCancel, onGoBack, showActi
                       <StepIcon className="w-5 h-5 text-gray-400" />
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div 
+                    className={`flex-1`}
+                  >
                     <span className={`text-sm font-semibold transition-colors duration-300 ${
                       isCompleted ? 'text-green-700' : 
                       isActive ? 'text-blue-700' : 'text-gray-500'

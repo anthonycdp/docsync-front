@@ -1,5 +1,5 @@
 import React from 'react'
-import { Upload, Settings, Eye, Download } from 'lucide-react'
+import { Upload, Settings, Eye, Download, Zap } from 'lucide-react'
 
 const WORKFLOW_STEPS = [
   {
@@ -19,6 +19,12 @@ const WORKFLOW_STEPS = [
     label: 'Revisão',
     description: 'Validar informações', 
     icon: Eye
+  },
+  {
+    id: 'generating',
+    label: 'Gerando',
+    description: 'Criando documento',
+    icon: Zap
   },
   {
     id: 'download',

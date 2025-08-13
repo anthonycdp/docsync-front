@@ -1,75 +1,46 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react';
 
-/**
- * Hook para scroll inteligente com configurações otimizadas por tipo de página
- */
-export const usePageScroll = (elementRef, pageType = 'default') => {
-  const pageConfigs = {
-    // Página de download - foca no título de sucesso
-    download: {
-      block: 'center',
-      delay: 200, // Aguarda animações de entrada
-      fallbackToTop: true
-    },
-    // Página de revisão - foca no cabeçalho  
-    preview: {
-      block: 'start',
-      delay: 150,
-      fallbackToTop: true
-    },
-    // Página de processamento - foca na barra de progresso
-    processing: {
-      block: 'center', 
-      delay: 100,
-      fallbackToTop: true
-    },
-    // Páginas de upload - foca na área ativa
-    upload: {
-      block: 'center',
-      delay: 200,
-      fallbackToTop: true
-    },
-    // Configuração padrão
-    default: {
-      block: 'center',
-      delay: 150, 
-      fallbackToTop: true
-    }
-  }
-
-  const config = pageConfigs[pageType] || pageConfigs.default
-  
-  const performScroll = useCallback(() => {
-    const scrollToElement = () => {
-      if (elementRef?.current) {
-        // CKDEV-NOTE: Usar scrollIntoView nativo para melhor performance e compatibilidade
-        elementRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: config.block,
-          inline: 'nearest'
-        })
-      } else if (config.fallbackToTop) {
-        // CKDEV-NOTE: Fallback para topo quando elemento não está disponível
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'auto'
-        })
-      }
-    }
-
-    if (config.delay > 0) {
-      const timeoutId = setTimeout(scrollToElement, config.delay)
-      return () => clearTimeout(timeoutId)
-    } else {
-      scrollToElement()
-    }
-  }, [elementRef, config])
-
+export const usePageScroll = (ref, trigger) => {
   useEffect(() => {
-    return performScroll()
-  }, [performScroll])
-
-  // CKDEV-NOTE: Retornar função para trigger manual se necessário
-  return performScroll
-}
+    if (trigger && ref) {
+      let attempts = 0;
+      const maxAttempts = 50; // CKDEV-NOTE: Máximo 5 segundos (50 * 100ms)
+      
+      const checkAndScroll = () => {
+        attempts++;
+        
+        if (ref.current) {
+          const element = ref.current;
+          const rect = element.getBoundingClientRect();
+          
+          // CKDEV-NOTE: Usar getBoundingClientRect para posição mais precisa
+          const elementTopFromViewport = rect.top;
+          const elementHeight = rect.height;
+          const windowHeight = window.innerHeight;
+          const currentScrollY = window.scrollY;
+          
+          // CKDEV-NOTE: Calcular posição para centralizar o elemento na viewport
+          const elementCenterY = elementTopFromViewport + currentScrollY + (elementHeight / 2);
+          const viewportCenterY = windowHeight / 2;
+          const scrollPosition = elementCenterY - viewportCenterY;
+          
+          // CKDEV-NOTE: Aplicar scroll suave para centralizar o elemento
+          window.scrollTo({
+            top: Math.max(0, scrollPosition),
+            behavior: 'smooth'
+          });
+          return;
+        }
+        
+        if (attempts < maxAttempts) {
+          setTimeout(checkAndScroll, 100);
+        }
+      };
+      
+      // CKDEV-NOTE: Aguardar animações do Framer Motion e renderização completa
+      const timer = setTimeout(checkAndScroll, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [ref, trigger]);
+};

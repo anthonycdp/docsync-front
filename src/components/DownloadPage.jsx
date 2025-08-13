@@ -7,6 +7,7 @@ import { Download, FileText, FileImage, CheckCircle, RefreshCw, ArrowLeft, Clock
 import BackToHomeButton from './BackToHomeButton'
 import { usePageScroll } from '../hooks/use-scroll-to-focus'
 
+
 function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHome }) {
   const [downloadingFile, setDownloadingFile] = useState(null)
   const [downloadedFiles, setDownloadedFiles] = useState([])
@@ -16,8 +17,8 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
   // CKDEV-NOTE: Ref para o elemento de foco principal (cards de download)
   const downloadCardsRef = useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza os cards de download na tela
-  usePageScroll(downloadCardsRef, 'download')
+  // CKDEV-NOTE: Hook para centralizar o foco nos cards de download
+  usePageScroll(downloadCardsRef, true)
 
   const getTemplateDisplayName = (templateId, fallbackName) => {
     const templateNames = {
@@ -347,7 +348,12 @@ function DownloadPage({ processedData, onBackToUpload, templateName, onBackToHom
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div ref={downloadCardsRef} className={`grid gap-6 ${pdfUrl ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-lg mx-auto'}`}>
+              <div 
+                ref={downloadCardsRef} 
+                tabIndex={0}
+                className={`grid gap-6 ${pdfUrl ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-lg mx-auto'} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white rounded-lg p-2`}
+                style={{ transform: 'none' }}
+              >
                 {/* DOCX Download - Always show if available */}
                 {processedData.download_url && (
                   <motion.div

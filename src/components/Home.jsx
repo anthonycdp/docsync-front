@@ -10,10 +10,12 @@ import ProcessingStatus from "./ProcessingStatus"
 import ProgressStepper from "./ProgressStepper"
 import PreviewStep from "./PreviewStep"
 import BackToHomeButton from "./BackToHomeButton"
+import GeneratingLoader from "./GeneratingLoader"
 import Footer from "./Footer"
 
+
 // CKDEV-NOTE: Centralized API base URL configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://doc-sync-service.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000'
 
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
@@ -22,8 +24,9 @@ export default function Home() {
   const [processedData, setProcessedData] = useState(null)
   const [currentView, setCurrentView] = useState('templates')
   const [validationResults, setValidationResults] = useState(null)
-  const [isGeneratingDocuments, setIsGeneratingDocuments] = useState(false)
+
   const [extractedData, setExtractedData] = useState(null)
+  const [isGeneratingDocs, setIsGeneratingDocs] = useState(false)
   
   useEffect(() => {
     // CKDEV-NOTE: Modo de teste removido - apenas dados reais dos PDFs serão utilizados
@@ -164,7 +167,6 @@ export default function Home() {
     setProcessingProgress(0)
     setProcessedData(null)
     setValidationResults(null)
-    setIsGeneratingDocuments(false)
     setExtractedData(null)
   }
 
@@ -174,14 +176,19 @@ export default function Home() {
   }
 
   const handleGenerateDocuments = async () => {
-    setIsGeneratingDocuments(true)
-    
     try {
       const sessionId = processedData?.session_id
       
       if (!sessionId) {
         throw new Error('Session ID não encontrado nos dados processados')
       }
+
+      // CKDEV-NOTE: Mostrar tela de transição antes de iniciar geração
+      setCurrentView('generating')
+      setIsGeneratingDocs(true)
+
+      // CKDEV-NOTE: Aguardar um pouco para mostrar a tela de transição
+      await new Promise(resolve => setTimeout(resolve, 800))
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -243,18 +250,41 @@ export default function Home() {
       
       alert(userMessage)
       
-      const goBack = window.confirm(userMessage + '\n\nDeseja voltar para o processamento?')
+      const goBack = window.confirm(userMessage + '\n\nDeseja voltar para a revisão?')
       if (goBack) {
-        setCurrentView('processing')
+        setCurrentView('review')
       }
     } finally {
-      setIsGeneratingDocuments(false)
+      setIsGeneratingDocs(false)
     }
   }
 
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template)
     setCurrentView('upload')
+    
+    // CKDEV-NOTE: Scroll para upload area após seleção do template
+    if (template.id === 'pagamento_terceiro' || template.id === 'declaracao_pagamento_terceiro') {
+      setTimeout(() => {
+        const uploadArea = document.querySelector('[data-testid="upload-area-proposta_pdf"]')
+        if (uploadArea) {
+          const rect = uploadArea.getBoundingClientRect()
+          const elementTopFromViewport = rect.top
+          const elementHeight = rect.height
+          const windowHeight = window.innerHeight
+          const currentScrollY = window.scrollY
+          
+          const elementCenterY = elementTopFromViewport + currentScrollY + (elementHeight / 2)
+          const viewportCenterY = windowHeight / 2
+          const scrollPosition = elementCenterY - viewportCenterY
+          
+          window.scrollTo({
+            top: Math.max(0, scrollPosition - 80),
+            behavior: 'smooth'
+          })
+        }
+      }, 800)
+    }
   }
 
   return (
@@ -299,6 +329,7 @@ export default function Home() {
               currentView === 'upload' ? 'upload' :
               currentView === 'processing' ? 'processing' :
               currentView === 'review' ? 'review' :
+              currentView === 'generating' ? 'generating' :
               currentView === 'download' ? 'download' : 'upload'
             } 
           />
@@ -523,11 +554,19 @@ export default function Home() {
               sessionId={processedData?.session_id}
               onDataCorrected={handleDataCorrected}
               onGenerateDocuments={handleGenerateDocuments}
-              isGenerating={isGeneratingDocuments}
+              isGenerating={isGeneratingDocs}
               onBack={handleBackToProcessing}
               onBackToHome={handleBackToHome}
             />
           </div>
+        )}
+
+        {/* Generating View */}
+        {currentView === 'generating' && (
+          <GeneratingLoader 
+            onBackToHome={handleBackToHome}
+            templateName={selectedTemplate?.name}
+          />
         )}
 
         {/* Download View */}
@@ -572,6 +611,7 @@ export default function Home() {
 
       {/* Footer */}
       <Footer />
+
     </div>
   )
 }

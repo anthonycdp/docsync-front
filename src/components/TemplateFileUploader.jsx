@@ -9,6 +9,7 @@ import FileTypeSelector from './FileTypeSelector'
 import FileWizard from './FileWizard'
 import { usePageScroll } from '../hooks/use-scroll-to-focus'
 
+
 const TEMPLATE_CONFIG = {
   // Termo de Responsabilidade - Veículos Usados
   responsabilidade_veiculo: {
@@ -87,13 +88,13 @@ function TemplateFileUploader({ template, onFilesUploaded, onCancel }) {
   
   // CKDEV-NOTE: Ref para o elemento de foco principal (área de upload)
   const uploadAreaRef = useRef(null)
-  
-  // CKDEV-NOTE: Scroll inteligente que centraliza a área de upload
-  usePageScroll(uploadAreaRef, 'upload')
+
+  // CKDEV-NOTE: Hook para centralizar o foco na área de upload quando o componente é montado
+  usePageScroll(uploadAreaRef, true)
   
   const templateConfig = TEMPLATE_CONFIG[template.id] || TEMPLATE_CONFIG.pagamento_terceiro
 
-  if (template.id === 'cessao_credito' || template.id === 'pagamento_terceiro') {
+  if (template.id === 'cessao_credito' || template.id === 'pagamento_terceiro' || template.id === 'declaracao_pagamento_terceiro') {
     return (
       <FileWizard
         template={template}
@@ -239,12 +240,12 @@ function TemplateFileUploader({ template, onFilesUploaded, onCancel }) {
         {/* Upload Area Container */}
         <div className="flex-1 min-h-0 flex flex-col">
           <motion.div
-          ref={uploadAreaRef}
           {...getRootProps()}
           className={`
             relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-500 overflow-hidden group
             ${getDropzoneStyle()}
             flex-1 flex flex-col justify-center min-h-[280px] max-h-[280px]
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
           `}
           whileHover={{ scale: 1.01, y: -2 }}
           whileTap={{ scale: 0.99 }}
@@ -303,7 +304,11 @@ function TemplateFileUploader({ template, onFilesUploaded, onCancel }) {
               </div>
             </motion.div>
           ) : (
-            <div className="relative z-10">
+            <div 
+              className="relative z-10"
+              ref={uploadAreaRef}
+              tabIndex={0}
+            >
               <motion.div
                 animate={{ 
                   y: isDragOver ? -3 : 0,

@@ -4,8 +4,8 @@ import { cn } from "../../lib/utils"
 const Separator = forwardRef(({ className, orientation = "horizontal", decorative = true, ...props }, ref) => (
   <div
     ref={ref}
-    decorative={decorative}
-    orientation={orientation}
+    data-decorative={decorative}
+    data-orientation={orientation}
     className={cn(
       "shrink-0 bg-gray-200",
       orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",

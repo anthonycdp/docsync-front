@@ -1,5 +1,4 @@
 // CKDEV-NOTE: Arquivo de índice para exportação centralizada dos componentes
-export { default as QuickGuide } from './QuickGuide';
 
 // Modern Modals
 export { default as ModernDocumentationModal } from './modals/ModernDocumentationModal';

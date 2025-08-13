@@ -47,7 +47,8 @@ import { useToast } from "../hooks/use-toast"
 import TemplatePreview from "./TemplatePreview"
 import { validateField, validateAllFields } from "../lib/validations"
 import BackToHomeButton from "./BackToHomeButton"
-import { usePageScroll } from '../hooks/use-scroll-to-focus'
+import { usePageScroll } from "../hooks/use-scroll-to-focus"
+
 
 // CKDEV-NOTE: Compact form field component with reduced spacing
 const FormField = memo(({ 
@@ -173,11 +174,11 @@ export default function PreviewStep({
   
   const fieldUpdateTimeouts = useRef({})
   
-  // CKDEV-NOTE: Ref para o elemento de foco principal (cabeçalho da revisão)
-  const headerRef = useRef(null)
+  // CKDEV-NOTE: Ref para o elemento de foco principal (card principal da revisão)
+  const mainCardRef = useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que foca no cabeçalho da revisão
-  usePageScroll(headerRef, 'preview')
+  // CKDEV-NOTE: Hook para centralizar o foco no card principal da revisão
+  usePageScroll(mainCardRef, true)
 
   const { data: sessionData, isLoading: isLoadingSession, error: sessionError } = useQuery({
     queryKey: ['session', sessionId],
@@ -530,13 +531,13 @@ export default function PreviewStep({
           animate={{ opacity: 1, y: 0 }}
           className="flex-shrink-0"
         >
-          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50">
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50" ref={mainCardRef} tabIndex={0}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle 
-                    ref={headerRef}
-                    className="flex items-center space-x-2 text-lg"
+                    tabIndex={0}
+                    className="flex items-center space-x-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white rounded px-2 py-1"
                   >
                     <Eye className="w-5 h-5 text-blue-600" />
                     <span>Revisão de Dados Extraídos</span>

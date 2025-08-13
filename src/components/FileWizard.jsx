@@ -55,6 +55,29 @@ const WIZARD_STEP_CONFIGS = {
       description: 'Documento que comprove o pagamento realizado',
       acceptsMultiple: false
     }
+  ],
+  declaracao_pagamento_terceiro: [
+    {
+      id: 'proposta_pdf',
+      title: 'Selecione a Proposta',
+      instruction: 'Faça upload ou selecione o arquivo da proposta de venda.',
+      description: 'Documento com informações da proposta comercial',
+      acceptsMultiple: false
+    },
+    {
+      id: 'cnh_terceiro', 
+      title: 'Selecione a CNH',
+      instruction: 'Faça upload ou selecione o arquivo da CNH do terceiro responsável.',
+      description: 'Carteira Nacional de Habilitação do terceiro',
+      acceptsMultiple: false
+    },
+    {
+      id: 'comprovante_pagamento',
+      title: 'Selecione o Comprovante de Pagamento',
+      instruction: 'Faça upload ou selecione o arquivo de comprovante de pagamento.',
+      description: 'Documento que comprove o pagamento realizado',
+      acceptsMultiple: false
+    }
   ]
 }
 
@@ -73,8 +96,65 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
   // CKDEV-NOTE: Ref para o elemento de foco principal (área de drag-and-drop)
   const uploadAreaRef = useRef(null)
   
-  // CKDEV-NOTE: Scroll inteligente que centraliza a área de drag-and-drop
-  usePageScroll(uploadAreaRef, 'upload')
+  // CKDEV-NOTE: Trigger scroll ao montar componente ou mudar de step
+  const [scrollTrigger, setScrollTrigger] = useState(true)
+  
+  // CKDEV-NOTE: Scroll automático para a área de upload quando step muda
+  usePageScroll(uploadAreaRef, scrollTrigger)
+  
+  // CKDEV-NOTE: Ativar scroll quando step muda ou componente monta
+  useEffect(() => {
+    setScrollTrigger(prev => !prev)
+    
+    // CKDEV-NOTE: Aguardar renderização completa antes de fazer scroll
+    const timer = setTimeout(() => {
+      if (uploadAreaRef.current) {
+        const element = uploadAreaRef.current
+        const rect = element.getBoundingClientRect()
+        const elementTopFromViewport = rect.top
+        const elementHeight = rect.height
+        const windowHeight = window.innerHeight
+        const currentScrollY = window.scrollY
+        
+        const elementCenterY = elementTopFromViewport + currentScrollY + (elementHeight / 2)
+        const viewportCenterY = windowHeight / 2
+        const scrollPosition = elementCenterY - viewportCenterY
+        
+        window.scrollTo({
+          top: Math.max(0, scrollPosition - 50), 
+          behavior: 'smooth'
+        })
+      }
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [currentStep])
+  
+  // CKDEV-NOTE: Scroll inicial quando componente monta
+  useEffect(() => {
+    const initialScrollTimer = setTimeout(() => {
+      if (uploadAreaRef.current) {
+        const element = uploadAreaRef.current
+        const rect = element.getBoundingClientRect()
+        const elementTopFromViewport = rect.top
+        const elementHeight = rect.height
+        const windowHeight = window.innerHeight
+        const currentScrollY = window.scrollY
+        
+        const elementCenterY = elementTopFromViewport + currentScrollY + (elementHeight / 2)
+        const viewportCenterY = windowHeight / 2
+        const scrollPosition = elementCenterY - viewportCenterY
+        
+        window.scrollTo({
+          top: Math.max(0, scrollPosition - 100), 
+          behavior: 'smooth'
+        })
+      }
+    }, 500)
+    
+    return () => clearTimeout(initialScrollTimer)
+  }, [])
+
 
   const WIZARD_STEPS = WIZARD_STEP_CONFIGS[template.id] || WIZARD_STEP_CONFIGS.cessao_credito
   const currentStepData = WIZARD_STEPS[currentStep]
@@ -256,11 +336,14 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
                 {/* Upload Area - Fixed Height */}
                 <div className="flex-1 min-h-0 flex flex-col">
                   <div
+                    ref={uploadAreaRef}
+                    tabIndex={0}
                     {...getRootProps()}
                     className={cn(
                       "relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-500 overflow-hidden group",
                       "border-gray-300 hover:border-gray-400 hover:bg-gray-50",
                       "flex-1 flex flex-col justify-center min-h-[280px] max-h-[280px]",
+                      "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
                       isDragActive && "border-blue-500 bg-blue-50 scale-105",
                       isDragAccept && "border-green-500 bg-green-50",
                       isDragReject && "border-red-500 bg-red-50"
@@ -315,7 +398,7 @@ function FileWizard({ template, onFilesUploaded, onCancel }) {
                         </div>
                       </motion.div>
                     ) : (
-                      <div ref={uploadAreaRef} className="flex flex-col justify-center h-full relative z-10">
+                      <div className="flex flex-col justify-center h-full relative z-10">
                         <div className="w-12 h-12 mx-auto mb-4 p-3 rounded-xl transition-all duration-300 bg-gray-100 group-hover:bg-blue-50 shadow-sm">
                           <Upload className={cn(
                             "w-full h-full transition-colors duration-300 text-gray-500 group-hover:text-blue-600",

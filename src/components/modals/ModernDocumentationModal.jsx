@@ -438,7 +438,7 @@ export default function ModernDocumentationModal({ open, onOpenChange }) {
               content: `import DocSync from '@docsync/client'
 
 const client = new DocSync({
-  apiKey: process.env.DOCSYNC_API_KEY,
+  apiKey: import.meta.env.VITE_DOCSYNC_API_KEY,
   baseURL: 'https://api.docsync.com'
 })`,
               type: "javascript"
